@@ -14,13 +14,12 @@ y = [];
 with open('../data/attackers_x.csv', 'r') as csv_x:
     r = csv.reader(csv_x, delimiter=' ')
     x = np.array(list(r))
-    x = np.array(map(lambda z: map(float, z), x))
-    print(x.shape)
+    x = x.astype(float)
 with open('../data/attackers_y.csv', 'r') as csv_y:
     r = csv.reader(csv_y, delimiter=' ')
     y = np.array(list(r))
     y.resize(y.shape[0])
-    y = np.array(map(float,y))
+    y = y.astype(float)
 
 def baseline_model():
     model = Sequential()
@@ -29,28 +28,11 @@ def baseline_model():
     model.add(Dense(1, kernel_initializer='normal'))
     model.compile(loss='mean_squared_error', optimizer='adam')
 
-#    model.fit(x,y, batch_size = 20, epochs = 2, validation_split = 0.2)
     return model
 
-
-#baseline_model()
-
-
-
-
+model = baseline_model()
+scaler = StandardScaler()
+x = scaler.fit_transform(x)
+model.fit(x,y, batch_size = 50, epochs = 5, validation_split = 0.25)
 
 
-
-seed = 5
-np.random.seed(seed)
-estimators = []
-estimators.append(('standardize', StandardScaler()))
-estimators.append(('mlp', KerasRegressor(build_fn=baseline_model, epochs=50, batch_size=5, verbose=1)))
-pipeline = Pipeline(estimators)
-
-#estimator = KerasRegressor(build_fn=baseline_model, nb_epoch=100, batch_size=5, verbose=0)
-
-kfold = KFold(n_splits=10, random_state=seed)
-
-results = cross_val_score(pipeline, x, y, cv=kfold)
-print("Results: %.2f (%.2f) MSE" % (results.mean(), results.std()))
