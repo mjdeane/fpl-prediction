@@ -1,5 +1,4 @@
 from selenium import webdriver
-from bs4 import BeautifulSoup
 import time
 from lxml import html
 import unicodecsv as csv
