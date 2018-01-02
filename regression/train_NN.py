@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 import csv
 import numpy as np
 from keras.models import Sequential
@@ -7,6 +10,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
+from scraping import api_utils
 
 x = [];
 y = [];
@@ -33,6 +37,29 @@ def baseline_model():
 model = baseline_model()
 scaler = StandardScaler()
 x = scaler.fit_transform(x)
-model.fit(x,y, batch_size = 50, epochs = 5, validation_split = 0.25)
+model.fit(x,y, batch_size = 50, epochs = 5)#, validation_split = 0.25)
 
+names = api_utils.getIdToNameDict()
+#print(names)
+(Z,ids) = api_utils.getAllPlayerInputVectors()
+Z = scaler.transform(Z)
+prediction = model.predict(Z)
+
+with open('../data/gameweek_' + str(api_utils.getNextGameweek()) + '_predictions.csv','w') as outfile:
+    w = csv.writer(outfile, delimiter=' ')
+    j = 0
+    for i in ids:
+        if i in names:
+            row = names[i], prediction[j][0]
+            j+=1
+            w.writerow(row)
+
+
+
+#test_vector = api_utils.getPlayerInputVector(279)
+#print(test_vector)
+#test_vector = scaler.transform(test_vector)
+#print(test_vector)
+#prediction = model.predict(test_vector)
+#print(prediction)
 
