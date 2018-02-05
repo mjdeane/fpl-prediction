@@ -1,6 +1,6 @@
 import sys
 sys.path.append('..')
-
+import os
 import csv
 import numpy as np
 from keras.models import Sequential
@@ -12,18 +12,36 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from scraping import api_utils
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
 x = [];
 y = [];
-
-with open('../data/attackers_x.csv', 'r') as csv_x:
+os.path.join(os.path.dirname(dir_path),'data','player_input_vectors_')
+with open(os.path.join(os.path.dirname(dir_path),'data','attackers_x.csv'), 'r') as csv_x:
     r = csv.reader(csv_x, delimiter=' ')
     x = np.array(list(r))
     x = x.astype(float)
-with open('../data/attackers_y.csv', 'r') as csv_y:
+with open(os.path.join(os.path.dirname(dir_path),'data','attackers_y.csv'), 'r') as csv_y:
     r = csv.reader(csv_y, delimiter=' ')
     y = np.array(list(r))
     y.resize(y.shape[0])
     y = y.astype(float)
+
+x0 =[]
+y0=[]
+with open(os.path.join(os.path.dirname(dir_path),'data','attackers2_x.csv'), 'r') as csv_x:
+    r = csv.reader(csv_x, delimiter=' ')
+    x0 = np.array(list(r))
+    x0 = x0.astype(float)
+with open(os.path.join(os.path.dirname(dir_path),'data','attackers2_y.csv'), 'r') as csv_y:
+    r = csv.reader(csv_y, delimiter=' ')
+    y0 = np.array(list(r))
+    print(y0.shape)
+    print(y0.shape[0])
+    y0.resize(y0.shape[0])
+    print(y0.shape)
+    print(str(y0))
+    y0 = y0.astype(float)
 
 def baseline_model():
     model = Sequential()
@@ -37,7 +55,8 @@ def baseline_model():
 model = baseline_model()
 scaler = StandardScaler()
 x = scaler.fit_transform(x)
-model.fit(x,y, batch_size = 50, epochs = 5)#, validation_split = 0.25)
+x0 = scaler.transform(x0)
+model.fit(x,y, batch_size = 50, epochs = 5, validation_data=(x0,y0))#, validation_split = 0.25)
 
 names = api_utils.getIdToNameDict()
 #print(names)
@@ -45,7 +64,7 @@ names = api_utils.getIdToNameDict()
 Z = scaler.transform(Z)
 prediction = model.predict(Z)
 
-with open('../data/gameweek_' + str(api_utils.getNextGameweek()) + '_predictions.csv','w') as outfile:
+with open(os.path.join(os.path.dirname(dir_path),'data','gameweek_'+ str(api_utils.getNextGameweek()) + '_predictions.csv'),'w') as outfile:
     w = csv.writer(outfile, delimiter=' ')
     j = 0
     for i in ids:
@@ -55,6 +74,9 @@ with open('../data/gameweek_' + str(api_utils.getNextGameweek()) + '_predictions
             w.writerow(row)
 
 
+print('EVALUATION')
+
+print(model.evaluate(x=x0,y=y0,batch_size=20))
 
 #test_vector = api_utils.getPlayerInputVector(279)
 #print(test_vector)

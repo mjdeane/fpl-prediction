@@ -8058,3 +8058,4 @@ KeyboardInterrupt
 1513736611159	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "2147487958"
 1513736611159	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "2147487952"
 1513736611433	Marionette	DEBUG	Received DOM event "pageshow" for "http://fplarchives.com/Seasons/1/Players/684"
+ATTENTION: default value of option force_s3tc_enable overridden by environment.
