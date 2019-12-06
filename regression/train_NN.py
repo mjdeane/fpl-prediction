@@ -17,6 +17,8 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 x = [];
 y = [];
 os.path.join(os.path.dirname(dir_path),'data','player_input_vectors_')
+# here we take attackers_x and attackers_y from csv to np.array
+# need to get new data instead here in (SAME SHAPE/DIFFERENT SHAPE ??)
 with open(os.path.join(os.path.dirname(dir_path),'data','attackers_x.csv'), 'r') as csv_x:
     r = csv.reader(csv_x, delimiter=' ')
     x = np.array(list(r))
@@ -29,6 +31,8 @@ with open(os.path.join(os.path.dirname(dir_path),'data','attackers_y.csv'), 'r')
 
 x0 =[]
 y0=[]
+#take test data from csvs
+# get new test data in (SAME SHAPE/DIFFERENT SHAPE)
 with open(os.path.join(os.path.dirname(dir_path),'data','attackers2_x.csv'), 'r') as csv_x:
     r = csv.reader(csv_x, delimiter=' ')
     x0 = np.array(list(r))
@@ -64,6 +68,7 @@ names = api_utils.getIdToNameDict()
 Z = scaler.transform(Z)
 prediction = model.predict(Z)
 
+#
 with open(os.path.join(os.path.dirname(dir_path),'data','gameweek_'+ str(api_utils.getNextGameweek()) + '_predictions.csv'),'w') as outfile:
     w = csv.writer(outfile, delimiter=' ')
     j = 0
