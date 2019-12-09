@@ -23,6 +23,16 @@ def getNextGameweek():
             gw_num = event["id"]
     return gw_num
 
+def getPreviousGameweek():
+    r = requests.get(PLAYERS_INFO_URL)
+    info = r.json()
+    events = info["events"]
+    gw_num = 0
+    for event in events:
+        if event["is_previous"] == True:
+            gw_num = event["id"]
+    return gw_num
+
 def getAllPlayersInfo():
     r = requests.get(PLAYERS_INFO_URL)
     info = r.json()
