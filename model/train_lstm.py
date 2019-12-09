@@ -10,7 +10,7 @@ from keras.layers import LSTM
 from keras.layers import TimeDistributed
 from sklearn.preprocessing import StandardScaler
 from sklearn.externals import joblib
-from scraping import api_utils
+from utils import api_utils
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -19,8 +19,8 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 # which should be cloned in same directory as this repo
 data_path = os.path.join(os.path.dirname(os.path.dirname(dir_path)), 'Fantasy-Premier-League', 'data')
 
-mids_set_16 = set([])
-mids_set_17 = set([])
+#mids_set_16 = set([])
+#mids_set_17 = set([])
 
 # find only midfielders
 #with open(os.path.join(os.path.dirname(dir_path), 'data', '2016-17', 'players_raw.csv')) as players:
