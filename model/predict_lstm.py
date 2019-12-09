@@ -1,6 +1,6 @@
 import sys
-sys.path.append('..')
 import os
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 import csv
 import numpy as np
 import pandas as pd
@@ -11,7 +11,7 @@ from keras.layers import LSTM
 from keras.layers import TimeDistributed
 from sklearn.preprocessing import StandardScaler
 from sklearn.externals import joblib
-from scraping import api_utils
+from utils import api_utils
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -96,6 +96,6 @@ x = np.stack(x).reshape(-1, GW-1, num_features)
 predictions = [i[-1][0] for i in model.predict(x)]
 
 output = pd.DataFrame(zip(players, predictions), columns = ['player', 'predicted score'])
-output = output.sort_values(by='predicted score',ascending=False)
+output = output.sort_values(by='predicted score',ascending=False).round(decimals=2)
 
 output.to_csv(os.path.join(os.path.dirname(dir_path), 'data', 'predictions', 'predictions_{}.csv'.format(GW)))
