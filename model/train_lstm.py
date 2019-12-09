@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 import os
 import csv
 import numpy as np
@@ -8,9 +10,13 @@ from keras.layers import LSTM
 from keras.layers import TimeDistributed
 from sklearn.preprocessing import StandardScaler
 from sklearn.externals import joblib
+from scraping import api_utils
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
+
+# uses data from https://github.com/vaastav/Fantasy-Premier-League
+# which should be cloned in same directory as this repo
 data_path = os.path.join(os.path.dirname(os.path.dirname(dir_path)), 'Fantasy-Premier-League', 'data')
 
 mids_set_16 = set([])
@@ -32,7 +38,8 @@ mids_set_17 = set([])
 #print(mids_set_17)
 
 
-def get_player_data(players_dir, mids_set):
+num_features = 28
+def get_player_data(players_dir, num_gws):
 	x = []
 	y = []
 
@@ -97,22 +104,27 @@ def get_player_data(players_dir, mids_set):
 			         'yellow_cards']]
 			if df.shape[0] < 2:
 				continue
-			if df.shape[0] < 38:
-				zeros_df = pd.DataFrame(np.zeros((38 - df.shape[0],28)), columns=df.columns)
+			if df.shape[0] < num_gws:
+				zeros_df = pd.DataFrame(np.zeros((num_gws - df.shape[0],num_features)), columns=df.columns)
 				df = pd.concat([zeros_df, df])
+			if df.shape[0] > num_gws:
+				df = df[:num_gws]
 			df.was_home.map({'True': 1, 'False': 0})
-			x.append(df.values.astype(float).reshape(1,38,28)[:,:-1,:])
-			y.append(df.total_points.values.astype(float).reshape(1, 38, 1)[:,1:,:])
-	x = np.stack(x).reshape(-1,37,28)
-	y = np.stack(y).reshape(-1,37,1)
+			x.append(df.values.astype(float).reshape(1,num_gws,num_features)[:,:-1,:])
+			y.append(df.total_points.values.astype(float).reshape(1, num_gws, 1)[:,1:,:])
+	x = np.stack(x).reshape(-1,num_gws-1,num_features)
+	y = np.stack(y).reshape(-1,num_gws-1,1)
 	return x, y
 
-x_train, y_train = get_player_data(os.path.join(data_path '2016-17', 'players'), mids_set_16)
-x_train0, y_train0 = get_player_data(os.path.join(data_path, '2017-18', 'players'), mids_set_16)
-x_val, y_val = get_player_data(os.path.join(data_path, '2018-19', 'players'), mids_set_17)
+x_train_16, y_train_16 = get_player_data(os.path.join(data_path, '2016-17', 'players'), 38)
+x_train_17, y_train_17 = get_player_data(os.path.join(data_path, '2017-18', 'players'), 38)
+x_train_18, y_train_18 = get_player_data(os.path.join(data_path, '2018-19', 'players'), 38)
 
-x_train = np.concatenate((x_train, x_train0))
-y_train = np.concatenate((y_train, y_train0))
+previous_gw = api_utils.getPreviousGameweek()
+x_val, y_val = get_player_data(os.path.join(data_path, '2019-20', 'players'), previous_gw)
+
+x_train = np.concatenate((x_train_16, x_train_17, x_train_18))
+y_train = np.concatenate((y_train_16, y_train_17, y_train_18))
 
 #def train_generator():
 #	while True:
@@ -126,7 +138,7 @@ y_train = np.concatenate((y_train, y_train0))
 
 # try a simple lstm with the data
 model = Sequential()
-model.add(LSTM(64, return_sequences=True, input_shape=(None,28)))
+model.add(LSTM(64, return_sequences=True, input_shape=(None,num_features)))
 model.add(LSTM(32, return_sequences=True))
 model.add(LSTM(16, return_sequences=True))
 model.add(TimeDistributed(Dense(1)))
@@ -138,16 +150,15 @@ model.compile(loss='mean_squared_error', optimizer='adam')
 #                    steps_per_epoch=len(x_train),
 #                    validation_steps=len(x_val),
 #                    epochs=1)
-
 scaler = StandardScaler()
-x_train = scaler.fit_transform(x_train.reshape(-1,28)).reshape(x_train.shape)
-x_val = scaler.transform(x_val.reshape(-1,28)).reshape(x_val.shape)
+x_train = scaler.fit_transform(x_train.reshape(-1,num_features)).reshape(x_train.shape)
+x_val = scaler.transform(x_val.reshape(-1,num_features)).reshape(x_val.shape)
 
 model.fit(x=x_train,
 	      y=y_train,
           validation_data=(x_val,y_val),
           batch_size=32,
-          epochs=10)
+          epochs=12)
 
 joblib.dump(scaler, 'standard_scaler.joblib')
 model.save('one_gw_prediction_lstm.h5')

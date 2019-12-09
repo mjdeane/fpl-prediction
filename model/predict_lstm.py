@@ -24,6 +24,8 @@ x = []
 players_dir = os.path.join(os.path.dirname(os.path.dirname(dir_path)), 'Fantasy-Premier-League', 'data', '2019-20', 'players')
 players = os.listdir(players_dir)
 
+num_features = 28
+
 for player in players:
 	with open(os.path.join(players_dir, player, 'gw.csv')) as gws:
 		df = pd.read_csv(gws)
@@ -82,14 +84,14 @@ for player in players:
 			         #'winning_goals',
 			         'yellow_cards']]
 		if df.shape[0] < GW - 1:
-			zeros_df = pd.DataFrame(np.zeros((GW - 1 - df.shape[0],28)), columns=df.columns)
+			zeros_df = pd.DataFrame(np.zeros((GW - 1 - df.shape[0],num_features)), columns=df.columns)
 			df = pd.concat([zeros_df, df])
 		if df.shape[0] > GW -1:
 			df = df[:GW]
 		df.was_home.map({'True': 1, 'False': 0})
-		x.append(scaler.transform(np.nan_to_num(df.values.astype(float))).reshape(1,-1,28))
+		x.append(scaler.transform(np.nan_to_num(df.values.astype(float))).reshape(1,-1,num_features))
 
-x = np.stack(x).reshape(-1, GW-1, 28)
+x = np.stack(x).reshape(-1, GW-1, num_features)
 
 predictions = [i[-1][0] for i in model.predict(x)]
 
