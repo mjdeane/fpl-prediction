@@ -15,8 +15,8 @@ from scraping import api_utils
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-model = load_model('one_gw_prediction_lstm.h5')
-scaler = joblib.load('standard_scaler.joblib')
+model = load_model(os.path.join(dir_path, 'one_gw_prediction_lstm.h5'))
+scaler = joblib.load(os.path.join(dir_path, 'standard_scaler.joblib'))
 
 GW = api_utils.getNextGameweek()
 
@@ -98,4 +98,4 @@ predictions = [i[-1][0] for i in model.predict(x)]
 output = pd.DataFrame(zip(players, predictions), columns = ['player', 'predicted score'])
 output = output.sort_values(by='predicted score',ascending=False)
 
-output.to_csv('predictions_{}.csv'.format(GW))
+output.to_csv(os.path.join(os.path.dirname(dir_path), 'data', 'predictions', 'predictions_{}.csv'.format(GW)))
