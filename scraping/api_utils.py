@@ -5,7 +5,7 @@ import argparse
 import numpy as np
 import os
 
-FPL_URL = "https://fantasy.premierleague.com/drf/"
+FPL_URL = "https://fantasy.premierleague.com/api/"
 PLAYER_SUMMARY_SUBURL = "element-summary/"
 PLAYER_SUMMARY_URL = FPL_URL + PLAYER_SUMMARY_SUBURL
 PLAYERS_INFO_SUBURL = "bootstrap-static"
@@ -17,7 +17,6 @@ def getNextGameweek():
     r = requests.get(PLAYERS_INFO_URL)
     info = r.json()
     return int(info['next-event'])
-    return 8
 
 def getAllPlayersInfo():
     r = requests.get(PLAYERS_INFO_URL)
