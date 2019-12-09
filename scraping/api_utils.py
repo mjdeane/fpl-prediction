@@ -8,7 +8,7 @@ import os
 FPL_URL = "https://fantasy.premierleague.com/api/"
 PLAYER_SUMMARY_SUBURL = "element-summary/"
 PLAYER_SUMMARY_URL = FPL_URL + PLAYER_SUMMARY_SUBURL
-PLAYERS_INFO_SUBURL = "bootstrap-static"
+PLAYERS_INFO_SUBURL = "bootstrap-static/"
 PLAYERS_INFO_URL = FPL_URL + PLAYERS_INFO_SUBURL
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -16,7 +16,12 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 def getNextGameweek():
     r = requests.get(PLAYERS_INFO_URL)
     info = r.json()
-    return int(info['next-event'])
+    events = info["events"]
+    gw_num = 0
+    for event in events:
+        if event["is_next"] == True:
+            gw_num = event["id"]
+    return gw_num
 
 def getAllPlayersInfo():
     r = requests.get(PLAYERS_INFO_URL)
