@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 import os
 import csv
 import numpy as np
@@ -9,13 +11,14 @@ from keras.layers import LSTM
 from keras.layers import TimeDistributed
 from sklearn.preprocessing import StandardScaler
 from sklearn.externals import joblib
+from scraping import api_utils
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 model = load_model('one_gw_prediction_lstm.h5')
 scaler = joblib.load('standard_scaler.joblib')
 
-GW = 16
+GW = api_utils.getNextGameweek()
 
 x = []
 players_dir = os.path.join(os.path.dirname(os.path.dirname(dir_path)), 'Fantasy-Premier-League', 'data', '2019-20', 'players')
@@ -78,13 +81,13 @@ for player in players:
 			         'was_home',
 			         #'winning_goals',
 			         'yellow_cards']]
-		if df.shape[0] < GW-1:
-				zeros_df = pd.DataFrame(np.zeros((GW - 1 - df.shape[0],28)), columns=df.columns)
-				df = pd.concat([zeros_df, df])
-#		if df.shape[0] == GW:
-#			df = df[:-1]
+		if df.shape[0] < GW - 1:
+			zeros_df = pd.DataFrame(np.zeros((GW - 1 - df.shape[0],28)), columns=df.columns)
+			df = pd.concat([zeros_df, df])
+		if df.shape[0] > GW -1:
+			df = df[:GW]
 		df.was_home.map({'True': 1, 'False': 0})
-		x.append(scaler.transform(df.values.astype(float)).reshape(1,-1,28))
+		x.append(scaler.transform(np.nan_to_num(df.values.astype(float))).reshape(1,-1,28))
 
 x = np.stack(x).reshape(-1, GW-1, 28)
 
@@ -93,4 +96,4 @@ predictions = [i[-1][0] for i in model.predict(x)]
 output = pd.DataFrame(zip(players, predictions), columns = ['player', 'predicted score'])
 output = output.sort_values(by='predicted score',ascending=False)
 
-output.to_csv('predictions.csv')
+output.to_csv('predictions_{}.csv'.format(GW))
