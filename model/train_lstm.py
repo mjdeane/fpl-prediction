@@ -1,6 +1,6 @@
 import sys
-sys.path.append('..')
 import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import csv
 import numpy as np
 import pandas as pd
@@ -17,7 +17,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 # uses data from https://github.com/vaastav/Fantasy-Premier-League
 # which should be cloned in same directory as this repo
-data_path = os.path.join(os.path.dirname(os.path.dirname(dir_path)), 'Fantasy-Premier-League', 'data')
+data_path = os.path.join(os.path.dirname(dir_path), 'data')
 
 #mids_set_16 = set([])
 #mids_set_17 = set([])
@@ -38,7 +38,7 @@ data_path = os.path.join(os.path.dirname(os.path.dirname(dir_path)), 'Fantasy-Pr
 #print(mids_set_17)
 
 
-num_features = 28
+num_features = 29
 def get_player_data(players_dir, num_gws):
 	x = []
 	y = []
@@ -84,6 +84,7 @@ def get_player_data(players_dir, num_gws):
 			         #'penalties_conceded',
 			         'penalties_missed',
 			         'penalties_saved',
+			         'position',
 			         #'recoveries',
 			         'red_cards',
 			         'round',

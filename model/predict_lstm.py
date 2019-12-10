@@ -24,7 +24,7 @@ x = []
 players_dir = os.path.join(os.path.dirname(os.path.dirname(dir_path)), 'Fantasy-Premier-League', 'data', '2019-20', 'players')
 players = os.listdir(players_dir)
 
-num_features = 28
+num_features = 29
 
 for player in players:
 	with open(os.path.join(players_dir, player, 'gw.csv')) as gws:
@@ -65,6 +65,7 @@ for player in players:
 			         #'penalties_conceded',
 			         'penalties_missed',
 			         'penalties_saved',
+			         'position',
 			         #'recoveries',
 			         'red_cards',
 			         'round',
