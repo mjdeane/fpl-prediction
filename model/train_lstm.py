@@ -38,7 +38,7 @@ data_path = os.path.join(os.path.dirname(dir_path), 'data')
 #print(mids_set_17)
 
 
-num_features = 29
+num_features = 33
 def get_player_data(players_dir, num_gws):
 	x = []
 	y = []
@@ -59,16 +59,19 @@ def get_player_data(players_dir, num_gws):
 			         #'clearances_blocks_interceptions',
 			         #'completed_passes',
 			         'creativity',
+			         'defender',
 			         #'dribbles',
 			         #'ea_index',
 			         #'element',
 			         #'errors_leading_to_goal',
 			         #'errors_leading_to_goal_attempt',
 			         #'fixture',
+			         'forward',
 			         #'fouls',
+			         'goalkeeper',
 			         'goals_conceded',
 			         'goals_scored',
-			         'ict_index',
+			         #'ict_index',
 			         #'id',
 			         'influence',
 			         #'key_passes',
@@ -76,15 +79,18 @@ def get_player_data(players_dir, num_gws):
 			         #'kickoff_time_formatted',
 			         #'loaned_in',
 			         #'loaned_out',
+			         'midfielder',
 			         'minutes',
 			         #'offside',
 			         #'open_play_crosses',
+			         'opponent_cum_xG',
+			         'opponent_cum_xGA',
+			         'opponent_cum_xpts',
 			         'opponent_team',
 			         'own_goals',
 			         #'penalties_conceded',
 			         'penalties_missed',
 			         'penalties_saved',
-			         'position',
 			         #'recoveries',
 			         'red_cards',
 			         'round',
@@ -96,7 +102,7 @@ def get_player_data(players_dir, num_gws):
 			         'team_a_score',
 			         'team_h_score',
 			         'threat',
-			         'transfers_balance',
+			         #'transfers_balance',
 			         'transfers_in',
 			         'transfers_out',
 			         'value',
@@ -161,5 +167,5 @@ model.fit(x=x_train,
           batch_size=32,
           epochs=12)
 
-joblib.dump(scaler, 'standard_scaler.joblib')
-model.save('one_gw_prediction_lstm.h5')
+joblib.dump(scaler, os.path.join(dir_path, 'standard_scaler.joblib'))
+model.save(os.path.join(dir_path, 'one_gw_prediction_lstm.h5'))
